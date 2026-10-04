@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>CET4小助手[安德塔构律大师出品]</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --bg:#16211f;
+  --panel:#1e2b28;
+  --panel-2:#233530;
+  --ink:#e8e1d0;
+  --ink-dim:#8f978d;
+  --accent:#c96a35;
+  --accent-dim:#7a4527;
+  --accent-2:#8a9c62;
+  --line:#34423d;
+  --danger:#a8453c;
+  --good:#7a9d5c;
+}
+*{box-sizing:border-box;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'IBM Plex Mono',monospace;
+  margin:0;
+  padding:24px 20px 40px;
+  min-height:100vh;
+}
+.wrap{max-width:720px;margin:0 auto;}
+
+.masthead{
+  border-bottom:1px solid var(--line);
+  padding-bottom:16px;
+  margin-bottom:20px;
+}
+.masthead .kicker{
+  font-size:11px;
+  letter-spacing:.14em;
+  color:var(--accent);
+  text-transform:uppercase;
+}
+.masthead h1{
+  font-family:'Zilla Slab',serif;
+  font-weight:700;
+  font-size:28px;
+  margin:4px 0 6px;
+  color:var(--ink);
+}
+.masthead .sub{
+  font-size:12px;
+  color:var(--ink-dim);
+  line-height:1.6;
+}
+
+.tabs{
+  display:flex;
+  gap:2px;
+  margin-bottom:20px;
+}
+.tab{
+  flex:1;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-bottom:none;
+  color:var(--ink-dim);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;
+  letter-spacing:.04em;
+  padding:10px 8px;
+  cursor:pointer;
+  text-align:center;
+  transition:background .15s, color .15s;
+}
+.tab.active{
+  background:var(--panel-2);
+  color:var(--accent);
+  font-weight:600;
+}
+.tab:hover:not(.active){color:var(--ink);}
+
+.panel{
+  background:var(--panel-2);
+  border:1px solid var(--line);
+  padding:20px;
+  min-height:320px;
+}
+.hidden{display:none;}
+
+label{
+  display:block;
+  font-size:11px;
+  color:var(--ink-dim);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  margin-bottom:6px;
+}
+textarea, input[type=text]{
+  width:100%;
+  background:var(--bg);
+  border:1px solid var(--line);
+  color:var(--ink);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:14px;
+  padding:10px 12px;
+  resize:vertical;
+}
+textarea:focus, input[type=text]:focus{
+  outline:none;
+  border-color:var(--accent-dim);
+}
+.field{margin-bottom:14px;}
+.row2{display:flex;gap:12px;}
+.row2 > div{flex:1;}
+
+button{
+  background:transparent;
+  border:1px solid var(--accent-dim);
+  color:var(--accent);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;
+  letter-spacing:.05em;
+  padding:9px 16px;
+  cursor:pointer;
+  transition:background .15s, color .15s;
+}
+button:hover{background:var(--accent-dim);color:var(--ink);}
+button.primary{
+  background:var(--accent-dim);
+  color:var(--ink);
+}
+button.primary:hover{background:var(--accent);}
+button.ghost{border-color:var(--line);color:var(--ink-dim);}
+button.ghost:hover{background:var(--panel);color:var(--ink);}
+button:disabled{opacity:.35;cursor:not-allowed;}
+button:disabled:hover{background:transparent;color:var(--accent);}
+
+.hint{font-size:11px;color:var(--ink-dim);margin-top:4px;line-height:1.6;}
+
+.type-toggle{display:flex;gap:8px;margin-bottom:14px;}
+.type-toggle button{flex:1;}
+.type-toggle button.selected{background:var(--accent-dim);color:var(--ink);}
+
+.entry-list{display:flex;flex-direction:column;gap:10px;margin-top:8px;}
+.entry-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-left:3px solid var(--accent-dim);
+  padding:12px 14px;
+  position:relative;
+}
+.entry-card.box0{border-left-color:var(--line);}
+.entry-card.box1{border-left-color:var(--accent-dim);}
+.entry-card.box2, .entry-card.box3{border-left-color:var(--accent);}
+.entry-card.box4{border-left-color:var(--accent-2);}
+.entry-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.entry-text{font-size:14px;color:var(--ink);line-height:1.5;}
+.speak-btn{
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--accent-2);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;
+  padding:4px 9px;
+  cursor:pointer;
+  flex-shrink:0;
+}
+.speak-btn:hover{border-color:var(--accent-2);background:var(--panel);}
+.speak-btn:disabled{opacity:.3;cursor:not-allowed;}
+.quiz-word-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;}
+.quiz-word-row .quiz-word{margin-bottom:0;}
+.entry-note{font-size:12px;color:var(--ink-dim);margin-top:4px;}
+.entry-meta{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.stage-pill{
+  font-size:10px;
+  letter-spacing:.05em;
+  color:var(--ink-dim);
+  border:1px solid var(--line);
+  padding:2px 8px;
+  text-transform:uppercase;
+}
+.entry-actions{display:flex;gap:6px;}
+.entry-actions button{padding:4px 8px;font-size:11px;}
+.empty-state{
+  text-align:center;
+  padding:40px 10px;
+  color:var(--ink-dim);
+  font-size:13px;
+  line-height:1.8;
+}
+.empty-state .glyph{font-size:22px;color:var(--accent-dim);display:block;margin-bottom:10px;}
+
+.quiz-source{display:flex;gap:8px;margin-bottom:18px;}
+.quiz-source button{flex:1;}
+.quiz-source button.selected{background:var(--accent-dim);color:var(--ink);}
+
+.quiz-stage{
+  border:1px solid var(--line);
+  background:var(--panel);
+  padding:24px 20px;
+  text-align:center;
+}
+.quiz-progress{font-size:11px;color:var(--ink-dim);letter-spacing:.05em;margin-bottom:14px;}
+.quiz-word{
+  font-family:'Zilla Slab',serif;
+  font-size:26px;
+  font-weight:600;
+  color:var(--ink);
+  margin-bottom:20px;
+  line-height:1.4;
+}
+.quiz-options{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{
+  background:var(--bg);
+  border:1px solid var(--line);
+  color:var(--ink);
+  padding:11px 14px;
+  font-size:13px;
+  text-align:left;
+  cursor:pointer;
+}
+.quiz-opt:hover{border-color:var(--accent-dim);}
+.quiz-opt.correct{border-color:var(--good);background:#1e2b23;color:var(--good);}
+.quiz-opt.wrong{border-color:var(--danger);background:#2b201e;color:#d18178;}
+.quiz-opt.disabled{cursor:default;}
+.quiz-footer{display:flex;justify-content:space-between;align-items:center;margin-top:18px;}
+.quiz-score{font-size:11px;color:var(--ink-dim);}
+
+.flash-card{
+  border:1px solid var(--line);
+  background:var(--panel);
+  padding:28px 20px;
+  text-align:center;
+  cursor:pointer;
+  min-height:140px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.flash-front{font-size:15px;line-height:1.7;color:var(--ink);}
+.flash-back{font-size:13px;line-height:1.7;color:var(--accent-2);}
+.flash-hint{font-size:11px;color:var(--ink-dim);margin-top:16px;}
+.flash-controls{display:flex;justify-content:center;gap:10px;margin-top:16px;}
+
+.stat-row{display:flex;gap:10px;margin-bottom:18px;}
+.stat{
+  flex:1;
+  background:var(--panel);
+  border:1px solid var(--line);
+  padding:12px;
+  text-align:center;
+}
+.stat .num{font-family:'Zilla Slab',serif;font-size:22px;color:var(--accent);}
+.stat .lbl{font-size:10px;color:var(--ink-dim);letter-spacing:.05em;text-transform:uppercase;margin-top:4px;}
+
+.toast{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--panel-2);
+  border:1px solid var(--accent-dim);
+  color:var(--ink);
+  padding:10px 18px;
+  font-size:12px;
+  opacity:0;
+  transition:opacity .25s;
+  pointer-events:none;
+}
+.toast.show{opacity:1;}
+
+/* ------ 错题库样式 ------ */
+.mistake-item {
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-left:3px solid var(--danger);
+  padding:12px 14px;
+  margin-bottom:10px;
+}
+.mistake-item .word {
+  font-size:15px;
+  font-weight:600;
+  color:var(--ink);
+}
+.mistake-item .meaning {
+  font-size:13px;
+  color:var(--ink-dim);
+  margin-top:2px;
+}
+.mistake-item .meta {
+  font-size:11px;
+  color:var(--ink-dim);
+  margin-top:6px;
+  display:flex;
+  gap:12px;
+}
+.mistake-item .meta .badge {
+  color:var(--danger);
+  border:1px solid var(--danger);
+  padding:0 8px;
+  border-radius:2px;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="kicker">CET4学习·并非可视化</div>
+    <h1>?!CET4?!</h1>
+    <div class="sub">莫名其妙记一些词或者句子，当然，也可以随时抽查CET4词库。</div>
+    <div style="margin-top:10px;display:flex;gap:8px;">
+      <button class="ghost" id="btn-export" style="padding:4px 12px;font-size:11px;">⬇ 备份到文件</button>
+      <button class="ghost" id="btn-import" style="padding:4px 12px;font-size:11px;">⬆ 从文件恢复</button>
+      <input type="file" id="file-import" accept="application/json" style="display:none;">
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="capture">速记</div>
+    <div class="tab" data-tab="notebook">独立库</div>
+    <div class="tab" data-tab="quiz">抽查</div>
+    <div class="tab" data-tab="mistakes">错题库</div>
+  </div>
+
+  <div class="panel" id="panel-capture">
+    <div class="type-toggle">
+      <button id="type-word" class="selected">单词</button>
+      <button id="type-sentence">句子</button>
+    </div>
+    <div class="field">
+      <label id="text-label">原文 (英文)</label>
+      <textarea id="input-text" rows="2" placeholder="比如: encyclopedic, 或整句台词"></textarea>
+      <button class="speak-btn" id="capture-speak" style="margin-top:6px;" title="朗读">&#9835; 朗读</button>
+    </div>
+    <div class="field">
+      <label>释义 / 备注(选填,但填了才能被抽查到)</label>
+      <input type="text" id="input-note" placeholder="中文释义或你的理解">
+    </div>
+    <div class="row2">
+      <button class="primary" id="btn-save" style="flex:1">存入独立库</button>
+      <button class="ghost" id="btn-clear" style="flex:1">清空</button>
+    </div>
+    <div class="hint" id="save-hint"></div>
+  </div>
+
+  <div class="panel hidden" id="panel-notebook">
+    <div class="stat-row" id="notebook-stats"></div>
+    <div id="notebook-list"></div>
+  </div>
+
+  <div class="panel hidden" id="panel-quiz">
+    <div class="quiz-source">
+      <button id="src-cet4" class="selected">CET4词库</button>
+      <button id="src-mine">我的独立库</button>
+    </div>
+    <div id="quiz-area"></div>
+  </div>
+
+  <!-- 错题库面板 -->
+  <div class="panel hidden" id="panel-mistakes">
+    <div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:12px;color:var(--ink-dim);">答错时自动收录，可手动清空</span>
+      <button class="ghost" id="clear-mistakes" style="padding:4px 12px;font-size:11px;">清空错题</button>
+    </div>
+    <div id="mistake-list"></div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const CET4 = [{"word": "access", "meaning": "v. 获取 n. 接近，入口"}, {"word": "project", "meaning": "n. 工程；课题、作业"}, {"word": "intention", "meaning": "n. 打算，意图"}, {"word": "equivalence", "meaning": "n. 等值，相等"}, {"word": "negotiate", "meaning": "v. 谈判，协商，交涉"}, {"word": "disappointing", "meaning": "adj. 令人失望的"}, {"word": "alternative", "meaning": "n. 代替品"}, {"word": "generous", "meaning": "adj. 慷慨的"}, {"word": "biological", "meaning": "adj. 生物的"}, {"word": "strategy", "meaning": "n. 策略，战略"}, {"word": "paradox", "meaning": "n. 悖论；自相矛盾"}, {"word": "primary", "meaning": "adj. 主要的，基本的"}, {"word": "standpoint", "meaning": "n. 立场"}, {"word": "grab", "meaning": "v. 抢先，抢占，抢夺"}, {"word": "crucial", "meaning": "adj. 至关重要的"}, {"word": "flaw", "meaning": "n. 缺点；错误"}, {"word": "depressed", "meaning": "adj. 萧条的；沮丧的"}, {"word": "obstacle", "meaning": "n. 阻碍"}, {"word": "automatic", "meaning": "adj. 自动的"}, {"word": "passionate", "meaning": "adj. 热情的"}, {"word": "gambling", "meaning": "n. 赌博"}, {"word": "logic", "meaning": "n. 逻辑"}, {"word": "theory", "meaning": "n. 理论"}, {"word": "download", "meaning": "v. 下载"}, {"word": "signal", "meaning": "n. 信号 v. 发信号，打信号；示意"}, {"word": "authoritative", "meaning": "adj. 权威的"}, {"word": "smooth", "meaning": "adj. 光滑的"}, {"word": "institution", "meaning": "n. 社会公共机构；制度；设立，制定"}, {"word": "vehicle", "meaning": "n. 车辆"}, {"word": "plague", "meaning": "v. 使困扰"}, {"word": "psychological", "meaning": "adj. 心理上的"}, {"word": "shade", "meaning": "n. 阴凉处"}, {"word": "persistent", "meaning": "adj. 持续的；坚持的"}, {"word": "voluntary", "meaning": "adj. 自愿的，主动的"}, {"word": "tolerance", "meaning": "n. 宽容，容忍"}, {"word": "senior", "meaning": "n. 老年人"}, {"word": "individual", "meaning": "n. 个人"}, {"word": "contemporary", "meaning": "adj. 当代的，现代的"}, {"word": "opposite", "meaning": "adj. 相反的"}, {"word": "specialize", "meaning": "v. 专业从事"}, {"word": "content", "meaning": "n. 内容"}, {"word": "philosopher", "meaning": "n. 哲学家"}, {"word": "unrest", "meaning": "n. 不安定，动荡"}, {"word": "startle", "meaning": "v. 吃惊"}, {"word": "emission", "meaning": "n. 排放，辐射"}, {"word": "overweight", "meaning": "adj. 超重的"}, {"word": "occupation", "meaning": "n. 职业，工作"}, {"word": "mainstream", "meaning": "n. 主流"}, {"word": "scholarship", "meaning": "n. 奖学金"}, {"word": "contract", "meaning": "n. 合同"}, {"word": "cheek", "meaning": "n. 脸颊"}, {"word": "interdependence", "meaning": "n. 相互依靠"}, {"word": "import", "meaning": "n. 进口 v. 进口"}, {"word": "fiction", "meaning": "n. 小说，虚构的文学作品"}, {"word": "upbringing", "meaning": "n. 养育，培养，教养"}, {"word": "preserve", "meaning": "v. 保护"}, {"word": "vitally", "meaning": "adv. 极其重要地"}, {"word": "masculine", "meaning": "adj. 男性的"}, {"word": "advocate", "meaning": "v. 倡导 n. 提倡者，拥护者，鼓吹者"}, {"word": "dust", "meaning": "n. 灰尘"}, {"word": "track", "meaning": "n. 足迹 v. 追踪，〔循着踪迹、气味等〕找寻"}, {"word": "confidence", "meaning": "n. 信心"}, {"word": "riotous", "meaning": "adj. 狂暴的"}, {"word": "sophisticated", "meaning": "adj. 复杂的；世故的"}, {"word": "similar", "meaning": "adj. 相似的"}, {"word": "transform", "meaning": "v. 改变"}, {"word": "approve", "meaning": "v. 赞成，同意"}, {"word": "session", "meaning": "n. 开会，会议"}, {"word": "awareness", "meaning": "n. 意识"}, {"word": "exhaust", "meaning": "v. 使筋疲力尽"}, {"word": "subsidize", "meaning": "v. 提供补贴"}, {"word": "grocery", "meaning": "n. 杂货店"}, {"word": "ignorance", "meaning": "n. 无知，愚昧"}, {"word": "intelligence", "meaning": "n. 智力，智慧，理解力"}, {"word": "tiny", "meaning": "adj. 微小的"}, {"word": "praise", "meaning": "v. 赞扬，赞美"}, {"word": "memorize", "meaning": "v. 熟记，牢记"}, {"word": "relative", "meaning": "adj. 相对的 n. 亲戚"}, {"word": "breakthrough", "meaning": "n. 突破"}, {"word": "incidence", "meaning": "n. 几率，发生率"}, {"word": "scratch", "meaning": "n. 抓，划痕"}, {"word": "harmful", "meaning": "adj. 有害的"}, {"word": "undergo", "meaning": "v. 承受"}, {"word": "recession", "meaning": "n. 衰退"}, {"word": "extraordinary", "meaning": "adj. 非凡的"}, {"word": "improper", "meaning": "adj. 不合适的，不适当的"}, {"word": "marginalize", "meaning": "v. 边缘化，排斥"}, {"word": "vital", "meaning": "adj. 重要的"}, {"word": "fortunately", "meaning": "adv. 幸运地"}, {"word": "commencement", "meaning": "n. 毕业典礼"}, {"word": "fetch", "meaning": "v. 取回"}, {"word": "clumsy", "meaning": "adj. 笨拙的，不圆滑的"}, {"word": "establishment", "meaning": "n. 确立"}, {"word": "emit", "meaning": "v. 发出，排出"}, {"word": "entertaining", "meaning": "adj. 有趣的，使人愉快的"}, {"word": "irregular", "meaning": "adj. 不规律的"}, {"word": "psychologist", "meaning": "n. 心理学家"}, {"word": "era", "meaning": "n. 纪元，年代"}, {"word": "triumph", "meaning": "n. 胜利"}, {"word": "detection", "meaning": "n. 侦查；察觉"}, {"word": "cozy", "meaning": "adj. 舒适的"}, {"word": "gallery", "meaning": "n. 美术馆"}, {"word": "enormous", "meaning": "adj. 巨大的"}, {"word": "obtain", "meaning": "v. 获得"}, {"word": "desert", "meaning": "v. 抛弃"}, {"word": "aviate", "meaning": "v. 驾驶飞机"}, {"word": "determine", "meaning": "v. 决定；下决心"}, {"word": "disappear", "meaning": "v. 不见，消失"}, {"word": "entitle", "meaning": "v. 使具有权利，使具有资格"}, {"word": "relieve", "meaning": "v. 解除，减轻，缓解"}, {"word": "generosity", "meaning": "n. 慷慨，大方"}, {"word": "colleague", "meaning": "n. 同事"}, {"word": "undertake", "meaning": "v. 承担"}, {"word": "convenient", "meaning": "adj. 方便的"}, {"word": "preferentially", "meaning": "adv. 优先地"}, {"word": "column", "meaning": "n. 专栏"}, {"word": "affectionate", "meaning": "adj. 深情的，柔情的"}, {"word": "issue", "meaning": "v. 发表〔声明〕 n. 问题"}, {"word": "inquire", "meaning": "v. 询问"}, {"word": "groundlessly", "meaning": "adv. 无缘无故地，无根据地"}, {"word": "independently", "meaning": "adv. 独立地"}, {"word": "approach", "meaning": "v. 靠近 n. 方法"}, {"word": "administration", "meaning": "n. 管理；〔某一时期的〕政府"}, {"word": "adversity", "meaning": "n. 逆境，不幸"}, {"word": "technician", "meaning": "n. 技术员，技师"}, {"word": "regular", "meaning": "adj. 有规律的，经常的"}, {"word": "miscalculation", "meaning": "n. 算错，误算"}, {"word": "hinder", "meaning": "v. 阻碍"}, {"word": "selection", "meaning": "n. 选择，挑选"}, {"word": "tide", "meaning": "n. 潮水"}, {"word": "superior", "meaning": "adj. 上级的，较高的 n. 上级，长官"}, {"word": "matter", "meaning": "v. 要紧，重要"}, {"word": "passively", "meaning": "adv. 消极地"}, {"word": "grant", "meaning": "v. 授予；允许"}, {"word": "liberation", "meaning": "n. 解放"}, {"word": "observe", "meaning": "v. 遵守"}, {"word": "institute", "meaning": "v. 建立 n. 〔从事科研或教育等的〕机构；学院；研究院"}, {"word": "dormitory", "meaning": "n. 宿舍"}, {"word": "awful", "meaning": "adj. 可怕的，骇人的"}, {"word": "emergency", "meaning": "n. 紧急情况"}, {"word": "stress", "meaning": "n. 压力；重音"}, {"word": "launch", "meaning": "v. 发动"}, {"word": "suppose", "meaning": "v. 料想，以为；假定；期望"}, {"word": "remove", "meaning": "v. 消除，移除"}, {"word": "exposure", "meaning": "n. 暴露；揭露"}, {"word": "promote", "meaning": "v. 促进，提升；推销"}, {"word": "engage", "meaning": "v. 从事；吸引"}, {"word": "uncertain", "meaning": "adj. 不确定的"}, {"word": "accommodate", "meaning": "v. 为…提供住宿"}, {"word": "slave", "meaning": "n. 奴隶"}, {"word": "mature", "meaning": "adj. 成熟的"}, {"word": "contrast", "meaning": "n. 对照物 v. 对比"}, {"word": "clinic", "meaning": "n. 诊所"}, {"word": "award", "meaning": "v. 授予；判给 n. 奖(金)"}, {"word": "worthwhile", "meaning": "adj. 有价值的"}, {"word": "cruelty", "meaning": "n. 残暴，残酷"}, {"word": "threaten", "meaning": "v. 威胁"}, {"word": "chemical", "meaning": "adj. 化学的 n. 化学制品"}, {"word": "consistent", "meaning": "adj. 一致的"}, {"word": "renew", "meaning": "v. 〔中止后〕重新开始，继续"}, {"word": "takeoff", "meaning": "n. 起飞"}, {"word": "innocent", "meaning": "adj. 无辜的；天真的"}, {"word": "currently", "meaning": "adv. 当前；一般地"}, {"word": "dropout", "meaning": "n. 辍学者"}, {"word": "replace", "meaning": "v. 代替"}, {"word": "sightseeing", "meaning": "n. 观光"}, {"word": "honor", "meaning": "n. 荣誉；崇敬，敬重，敬意"}, {"word": "imitate", "meaning": "v. 模仿"}, {"word": "installment", "meaning": "n. 分期付款"}, {"word": "personality", "meaning": "n. 个性，性格"}, {"word": "headquarter", "meaning": "v. 设立总部，在…设立总部"}, {"word": "ingredient", "meaning": "n. 成分，原料"}, {"word": "revenue", "meaning": "n. 收入"}, {"word": "sensitive", "meaning": "adj. 敏感的"}, {"word": "particular", "meaning": "adj. 特别的，特指的；讲究的；挑剔的，吹毛求疵的"}, {"word": "tumor", "meaning": "n. 瘤"}, {"word": "consequence", "meaning": "n. 结果，成果"}, {"word": "explicitly", "meaning": "adv. 直接地，明确地"}, {"word": "sway", "meaning": "v. 影响"}, {"word": "technical", "meaning": "adj. 技术的"}, {"word": "expert", "meaning": "adj. 熟练的，内行的"}, {"word": "harm", "meaning": "n. 损害；危害；伤害 v. 伤害，损害〔某事物〕"}, {"word": "imaginary", "meaning": "adj. 虚构的，想象的"}, {"word": "contaminate", "meaning": "v. 污染，弄脏"}, {"word": "soar", "meaning": "v. 猛增"}, {"word": "solely", "meaning": "adv. 单独地，唯一地"}, {"word": "tremendous", "meaning": "adj. 巨大的"}, {"word": "civilization", "meaning": "n. 文明"}, {"word": "tough", "meaning": "adj. 困难的"}, {"word": "gift", "meaning": "n. 礼物；天赋"}, {"word": "scale", "meaning": "n. 规模；比例"}, {"word": "injure", "meaning": "v. 使受伤"}, {"word": "embrace", "meaning": "v. 拥抱；欣然接受，乐意采纳 (新思想、意见、宗教等)"}, {"word": "seldom", "meaning": "adv. 很少，罕见"}, {"word": "performance", "meaning": "n. 演出；履行；表现"}, {"word": "violate", "meaning": "v. 违反"}, {"word": "associate", "meaning": "v. 把……联系起来；交往；"}, {"word": "privacy", "meaning": "n. 隐私"}, {"word": "choke", "meaning": "v. 使窒息"}, {"word": "capable", "meaning": "adj. 能干的，有能力的"}, {"word": "appeal", "meaning": "n. 呼吁 v. 吸引；呼吁；恳请，恳求"}, {"word": "careless", "meaning": "adj. 粗心的"}, {"word": "hit", "meaning": "n. (唱片、电影或戏剧的) 成功；命中，击中"}, {"word": "swallow", "meaning": "v. 咽下，吞下"}, {"word": "consult", "meaning": "v. 咨询"}, {"word": "preservation", "meaning": "n. 保存，保留"}, {"word": "distance", "meaning": "n. 距离"}, {"word": "plastic", "meaning": "adj. 塑料的"}, {"word": "predict", "meaning": "v. 预言，预测，预告"}, {"word": "submit", "meaning": "v. 提交"}, {"word": "entertainment", "meaning": "n. 娱乐"}, {"word": "critical", "meaning": "adj. 批评的，爱挑剔的"}, {"word": "transaction", "meaning": "n. 交易，业务，事务"}, {"word": "via", "meaning": "prep. 通过"}, {"word": "insist", "meaning": "v. 主张，坚持"}, {"word": "distract", "meaning": "v. 分心"}, {"word": "subdivision", "meaning": "n. 分支; 分部"}, {"word": "yield", "meaning": "v. 产生，得出〔结果、答案或资料 n. 产量"}, {"word": "misunderstand", "meaning": "v. 误解"}, {"word": "detail", "meaning": "n. 细节"}, {"word": "immeasurable", "meaning": "adj. 无法估量的"}, {"word": "convincing", "meaning": "adj. 令人信服的"}, {"word": "donate", "meaning": "v. 捐赠"}, {"word": "compare", "meaning": "v. 比较，对照"}, {"word": "item", "meaning": "n. 〔尤指清单上、一群或一组事物中的〕一项，一件，一条"}, {"word": "concrete", "meaning": "adj. 具体的"}, {"word": "govern", "meaning": "v. 管理，支配"}, {"word": "classify", "meaning": "v. 把…分类，把…分级"}, {"word": "restrict", "meaning": "v. 限制，限定"}, {"word": "establish", "meaning": "v. 建立，创办，设立"}, {"word": "counseling", "meaning": "n. 咨询服务"}, {"word": "majority", "meaning": "n. 多数"}, {"word": "contact", "meaning": "n. 联系，接触 v. 〔写信、打电话〕联系〔某人〕"}, {"word": "virtual", "meaning": "adj. 虚拟的"}, {"word": "simplicity", "meaning": "n. 简单"}, {"word": "enrollment", "meaning": "n. 入学人数"}, {"word": "programming", "meaning": "n. 〔计算机的〕程序编写，程序设计；程序；；〔电视或广播〕节目；电视[广播]节目策划，编排"}, {"word": "device", "meaning": "n. 装置，设备"}, {"word": "previous", "meaning": "adj. 之前的"}, {"word": "alter", "meaning": "v. 改变"}, {"word": "coach", "meaning": "n. 教练 v. 当…的教练，训练，培训"}, {"word": "crisis", "meaning": "n. 危机"}, {"word": "interconnect", "meaning": "v. 相互联系"}, {"word": "enrich", "meaning": "v. 丰富；使富有"}, {"word": "poll", "meaning": "n. 民意调查"}, {"word": "consent", "meaning": "v. 允许，同意 n. 同意，赞同"}, {"word": "utility", "meaning": "n. 公用事业〔如煤气、电力等〕"}, {"word": "poisonous", "meaning": "adj. 有毒的，有害的"}, {"word": "collision", "meaning": "n. 冲突，抵触"}, {"word": "rank", "meaning": "v. 具有…等级[地位] n. 衔，阶层"}, {"word": "fundamentally", "meaning": "adv. 根本上"}, {"word": "inflation", "meaning": "n. 通货膨胀"}, {"word": "secure", "meaning": "v. 确保……安全"}, {"word": "interpret", "meaning": "v. 解释"}, {"word": "criticize", "meaning": "v. 批评；评论"}, {"word": "arrest", "meaning": "v. 逮捕"}, {"word": "afford", "meaning": "v. 负担得起"}, {"word": "implementation", "meaning": "n. 实现，履行"}, {"word": "initiate", "meaning": "v. 开始，发起"}, {"word": "enable", "meaning": "v. 使能够……"}, {"word": "narrow", "meaning": "adj. 狭窄的"}, {"word": "overcharge", "meaning": "v. 向……多收费"}, {"word": "shortcut", "meaning": "n. 捷径，近路"}, {"word": "leisure", "meaning": "n. 悠闲，空闲"}, {"word": "original", "meaning": "adj. 原始的，最初的"}, {"word": "density", "meaning": "n. 密度"}, {"word": "sphere", "meaning": "n. 球体；范围"}, {"word": "margin", "meaning": "n. 页边的空白，页边，白边"}, {"word": "department", "meaning": "n. 部门"}, {"word": "desire", "meaning": "n. 渴望，欲望"}, {"word": "legend", "meaning": "n. 传奇"}, {"word": "dictator", "meaning": "n. 独裁者；专制者"}, {"word": "diversity", "meaning": "n. 多样性；差异"}, {"word": "quit", "meaning": "v. 放弃"}, {"word": "outgoing", "meaning": "adj. 开朗的；外向的；外出的"}, {"word": "solution", "meaning": "n. 解决，解答，解决办法"}, {"word": "revenge", "meaning": "n. 报仇"}, {"word": "reverse", "meaning": "n. 相反情况；正相反 a. 相反的"}, {"word": "enroll", "meaning": "v. 注册"}, {"word": "logically", "meaning": "adv. 合乎情理地，符合逻辑地"}, {"word": "rental", "meaning": "n. 租金"}, {"word": "component", "meaning": "n. 成分"}, {"word": "quotation", "meaning": "n. 引文"}, {"word": "faith", "meaning": "n. 信任"}, {"word": "invalid", "meaning": "adj. 无效的"}, {"word": "invade", "meaning": "v. 侵入，侵略"}, {"word": "separately", "meaning": "adv. 分别地，另行"}, {"word": "strain", "meaning": "v. 扭伤，拉伤"}, {"word": "accessible", "meaning": "adj. 易接近的"}, {"word": "lap", "meaning": "n. 〔坐着时的〕大腿部"}, {"word": "character", "meaning": "n. 角色"}, {"word": "widespread", "meaning": "adj. 普遍的，广泛的"}, {"word": "rearrange", "meaning": "v. 重新安排"}, {"word": "hospitalize", "meaning": "v. 就医"}, {"word": "avail", "meaning": "v. 有益, 有帮助"}, {"word": "instant", "meaning": "adj. 立即的；紧急的；速溶的，方便的"}, {"word": "democratic", "meaning": "adj. 民主的"}, {"word": "barely", "meaning": "adv. 仅仅，几乎不"}, {"word": "vanish", "meaning": "v. 消失"}, {"word": "caregiver", "meaning": "n. 照料者"}];
+
+let entries = [];
+let quizState = null;
+let flashState = null;
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1600);
+}
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    toast('这个浏览器不支持朗读');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.92;
+  window.speechSynthesis.speak(u);
+}
+
+async function loadEntries(){
+  try{
+    const raw = localStorage.getItem('cet4_entries');
+    entries = raw ? JSON.parse(raw) : [];
+  }catch(e){
+    entries = [];
+  }
+}
+async function saveEntries(){
+  try{
+    localStorage.setItem('cet4_entries', JSON.stringify(entries));
+  }catch(e){
+    console.error('save failed', e);
+    toast('保存失败，可能是浏览器存储空间已满');
+  }
+}
+
+let entryType = 'word';
+document.getElementById('type-word').onclick = ()=>{
+  entryType='word';
+  document.getElementById('type-word').classList.add('selected');
+  document.getElementById('type-sentence').classList.remove('selected');
+  document.getElementById('text-label').textContent='原文 (英文单词)';
+  document.getElementById('input-text').placeholder='比如: encyclopedic';
+};
+document.getElementById('type-sentence').onclick = ()=>{
+  entryType='sentence';
+  document.getElementById('type-sentence').classList.add('selected');
+  document.getElementById('type-word').classList.remove('selected');
+  document.getElementById('text-label').textContent='原文 (英文句子)';
+  document.getElementById('input-text').placeholder='比如整句台词';
+};
+
+document.getElementById('capture-speak').onclick = ()=>{
+  const text = document.getElementById('input-text').value.trim();
+  if(text) speak(text); else toast('先输入点内容');
+};
+
+document.getElementById('btn-clear').onclick = ()=>{
+  document.getElementById('input-text').value='';
+  document.getElementById('input-note').value='';
+};
+
+document.getElementById('btn-save').onclick = async ()=>{
+  const text = document.getElementById('input-text').value.trim();
+  const note = document.getElementById('input-note').value.trim();
+  const hint = document.getElementById('save-hint');
+  if(!text){
+    hint.textContent = '先填一点原文再存入吧。';
+    hint.style.color = 'var(--danger)';
+    return;
+  }
+  entries.unshift({
+    id: uid(),
+    type: entryType,
+    text, note,
+    box: 0,
+    createdAt: Date.now()
+  });
+  await saveEntries();
+  document.getElementById('input-text').value='';
+  document.getElementById('input-note').value='';
+  hint.textContent = '已存入库中。';
+  hint.style.color = 'var(--good)';
+  toast('已归档');
+  speak(text);
+  renderNotebook();
+};
+
+function stageLabel(box){
+  if(box<=0) return '未归档';
+  if(box<=2) return '潜伏中';
+  if(box===3) return '内化中';
+  return '已内化';
+}
+
+function renderNotebook(){
+  const list = document.getElementById('notebook-list');
+  const stats = document.getElementById('notebook-stats');
+  const words = entries.filter(e=>e.type==='word').length;
+  const sentences = entries.filter(e=>e.type==='sentence').length;
+  const internalized = entries.filter(e=>e.box>=4).length;
+  stats.innerHTML = `
+    <div class="stat"><div class="num">${entries.length}</div><div class="lbl">总计</div></div>
+    <div class="stat"><div class="num">${words}</div><div class="lbl">单词</div></div>
+    <div class="stat"><div class="num">${sentences}</div><div class="lbl">句子</div></div>
+    <div class="stat"><div class="num">${internalized}</div><div class="lbl">已内化</div></div>
+  `;
+  if(entries.length===0){
+    list.innerHTML = `<div class="empty-state"><span class="glyph">卷宗为空</span>去"速记"页存一些句子和单词进来吧。</div>`;
+    return;
+  }
+  list.innerHTML = '<div class="entry-list">' + entries.map(e=>`
+    <div class="entry-card box${Math.min(e.box,4)}" data-id="${e.id}">
+      <div class="entry-top">
+        <div style="flex:1">
+          <div class="entry-text">${escapeHtml(e.text)}</div>
+          ${e.note ? `<div class="entry-note">${escapeHtml(e.note)}</div>` : ''}
+        </div>
+        <button class="speak-btn" data-speak="${escapeHtml(e.text)}" title="朗读">&#9835;</button>
+      </div>
+      <div class="entry-meta">
+        <span class="stage-pill">${e.type==='word'?'单词':'句子'}</span>
+        <span class="stage-pill">${stageLabel(e.box)}</span>
+        <div style="flex:1"></div>
+        <div class="entry-actions">
+          <button class="ghost del-btn" data-id="${e.id}">删除</button>
+        </div>
+      </div>
+    </div>
+  `).join('') + '</div>';
+
+  list.querySelectorAll('.speak-btn').forEach(btn=>{
+    btn.onclick = ()=>speak(btn.getAttribute('data-speak'));
+  });
+
+  list.querySelectorAll('.del-btn').forEach(btn=>{
+    btn.onclick = async ()=>{
+      const id = btn.getAttribute('data-id');
+      entries = entries.filter(e=>e.id!==id);
+      await saveEntries();
+      renderNotebook();
+      toast('已移除');
+    };
+  });
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+let quizSource = 'cet4';
+document.getElementById('src-cet4').onclick = ()=>{
+  quizSource='cet4';
+  document.getElementById('src-cet4').classList.add('selected');
+  document.getElementById('src-mine').classList.remove('selected');
+  startQuizRound();
+};
+document.getElementById('src-mine').onclick = ()=>{
+  quizSource='mine';
+  document.getElementById('src-mine').classList.add('selected');
+  document.getElementById('src-cet4').classList.remove('selected');
+  startQuizRound();
+};
+
+let quizScore = {correct:0, total:0};
+
+function pickDistractors(pool, correctIdx, count){
+  const idxs = new Set([correctIdx]);
+  while(idxs.size < Math.min(count+1, pool.length)){
+    idxs.add(Math.floor(Math.random()*pool.length));
+  }
+  return Array.from(idxs);
+}
+
+function startQuizRound(){
+  const area = document.getElementById('quiz-area');
+
+  if(quizSource==='cet4'){
+    renderWordQuiz(CET4, (w)=>w.word, (w)=>w.meaning);
+    return;
+  }
+
+  const myWords = entries.filter(e=>e.type==='word' && e.note);
+  if(myWords.length < 4){
+    area.innerHTML = `<div class="empty-state"><span class="glyph">存货不够</span>我的独立库里带释义的单词不足4个,先去"速记"多存几个吧(句子也可以用下方的翻卡模式复习)。</div>`;
+    return;
+  }
+  renderWordQuiz(myWords, (w)=>w.text, (w)=>w.note);
+}
+
+function renderWordQuiz(pool, getWord, getMeaning){
+  const area = document.getElementById('quiz-area');
+  const correctIdx = Math.floor(Math.random()*pool.length);
+  const optionIdxs = pickDistractors(pool, correctIdx, 3);
+  optionIdxs.sort(()=>Math.random()-0.5);
+  const correctItem = pool[correctIdx];
+
+  area.innerHTML = `
+    <div class="quiz-stage">
+      <div class="quiz-progress">本轮 ${quizScore.total+1}题 &middot; 正确 ${quizScore.correct}/${quizScore.total}</div>
+      <div class="quiz-word-row">
+        <div class="quiz-word">${escapeHtml(getWord(correctItem))}</div>
+        <button class="speak-btn" id="quiz-speak" title="朗读">&#9835;</button>
+      </div>
+      <div class="quiz-options">
+        ${optionIdxs.map(i=>`<div class="quiz-opt" data-correct="${i===correctIdx}" data-idx="${i}">${escapeHtml(getMeaning(pool[i]))}</div>`).join('')}
+      </div>
+      <div class="quiz-footer">
+        <span class="quiz-score">来源: ${quizSource==='cet4' ? 'CET4核心词库' : '我的独立库'}</span>
+        <button id="quiz-next" disabled>下一题</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('quiz-speak').onclick = ()=>speak(getWord(correctItem));
+  speak(getWord(correctItem));
+
+  const opts = area.querySelectorAll('.quiz-opt');
+  let answered = false;
+  opts.forEach(opt=>{
+    opt.onclick = async ()=>{
+      if(answered) return;
+      answered = true;
+      const isCorrect = opt.getAttribute('data-correct')==='true';
+      opts.forEach(o=>o.classList.add('disabled'));
+      if(isCorrect){
+        opt.classList.add('correct');
+        quizScore.correct++;
+      }else{
+        opt.classList.add('wrong');
+        opts.forEach(o=>{if(o.getAttribute('data-correct')==='true') o.classList.add('correct');});
+      }
+      quizScore.total++;
+
+      // 答错时记录（兼容两种格式）
+      if(!isCorrect){
+        addMistake(correctItem, quizSource==='cet4' ? 'CET4词库' : '我的独立库');
+      }
+
+      if(quizSource==='mine'){
+        const idInPool = correctItem.id;
+        const target = entries.find(e=>e.id===idInPool);
+        if(target){
+          target.box = isCorrect ? Math.min((target.box||0)+1, 4) : 0;
+          await saveEntries();
+        }
+      }
+
+      document.getElementById('quiz-next').disabled = false;
+    };
+  });
+
+  document.getElementById('quiz-next').onclick = ()=>startQuizRound();
+}
+
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.getAttribute('data-tab')===name));
+  document.getElementById('panel-capture').classList.toggle('hidden', name!=='capture');
+  document.getElementById('panel-notebook').classList.toggle('hidden', name!=='notebook');
+  document.getElementById('panel-quiz').classList.toggle('hidden', name!=='quiz');
+  document.getElementById('panel-mistakes').classList.toggle('hidden', name!=='mistakes');
+  if(name==='notebook') renderNotebook();
+  if(name==='quiz'){ quizScore={correct:0,total:0}; startQuizRound(); }
+  if(name==='mistakes') renderMistakes();
+}
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick = ()=>switchTab(t.getAttribute('data-tab'));
+});
+
+(async function init(){
+  await loadEntries();
+  renderNotebook();
+  renderMistakes();
+})();
+
+
+// ===== 错题库（修复版） =====
+let mistakes = JSON.parse(localStorage.getItem('mistakes')||'[]');
+function saveMistakes(){localStorage.setItem('mistakes',JSON.stringify(mistakes));}
+
+// 兼容 CET4 ({word, meaning}) 和 内阁 ({text, note})
+function addMistake(item, source){
+  let word, meaning;
+  if (item.word !== undefined) {
+    word = item.word;
+    meaning = item.meaning || '';
+  } else if (item.text !== undefined) {
+    word = item.text;
+    meaning = item.note || '';
+  } else {
+    return;
+  }
+  let old = mistakes.find(x => x.word === word);
+  if (old) {
+    old.wrongCount++;
+    old.lastWrong = new Date().toLocaleDateString();
+  } else {
+    mistakes.push({
+      word,
+      meaning,
+      pos: '',
+      source: source || '未知',
+      wrongCount: 1,
+      lastWrong: new Date().toLocaleDateString()
+    });
+  }
+  saveMistakes();
+}
+
+function renderMistakes(){
+  const el = document.getElementById('mistake-list');
+  if (!el) return;
+  if (mistakes.length === 0) {
+    el.innerHTML = `<div class="empty-state"><span class="glyph">📭</span>暂无错题，去「抽查」里答错几个试试吧。</div>`;
+    return;
+  }
+  const sorted = [...mistakes].sort((a,b) => b.wrongCount - a.wrongCount);
+  el.innerHTML = sorted.map(m => `
+    <div class="mistake-item">
+      <div class="word">${escapeHtml(m.word)}</div>
+      <div class="meaning">${escapeHtml(m.meaning)}</div>
+      <div class="meta">
+        <span>来源：${escapeHtml(m.source)}</span>
+        <span>错误 <span class="badge">${m.wrongCount}次</span></span>
+        <span>最近：${m.lastWrong || '--'}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// 清空错题
+document.getElementById('clear-mistakes')?.addEventListener('click', ()=>{
+  if (confirm('确定要清空所有错题记录吗？')) {
+    mistakes = [];
+    saveMistakes();
+    renderMistakes();
+    toast('错题库已清空');
+  }
+});
+
+// 重新绑定tab以确保切换时刷新错题库
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick = ()=>switchTab(t.getAttribute('data-tab'));
+});
+
+// ===== 备份 / 恢复到本地文件 =====
+// localStorage 保存在浏览器里，换浏览器/换电脑/清理浏览器数据都会丢失，
+// 所以额外提供导出成真实文件的方式，才是真正意义上"保存在本地"。
+document.getElementById('btn-export')?.addEventListener('click', ()=>{
+  const backup = {
+    exportedAt: new Date().toISOString(),
+    entries,
+    mistakes
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const ts = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `cet4-backup-${ts}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('已导出备份文件');
+});
+
+document.getElementById('btn-import')?.addEventListener('click', ()=>{
+  document.getElementById('file-import').click();
+});
+
+document.getElementById('file-import')?.addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      const incomingEntries = Array.isArray(data.entries) ? data.entries : [];
+      const incomingMistakes = Array.isArray(data.mistakes) ? data.mistakes : [];
+      if(!confirm(`备份文件包含 ${incomingEntries.length} 条独立库记录、${incomingMistakes.length} 条错题记录。\n恢复将覆盖当前数据，确定继续吗？`)) return;
+      entries = incomingEntries;
+      mistakes = incomingMistakes;
+      await saveEntries();
+      saveMistakes();
+      renderNotebook();
+      renderMistakes();
+      toast('恢复成功');
+    }catch(err){
+      toast('文件格式不对，恢复失败');
+    }finally{
+      e.target.value = '';
+    }
+  };
+  reader.readAsText(file);
+});
+</script>
+</body>
+</html>
